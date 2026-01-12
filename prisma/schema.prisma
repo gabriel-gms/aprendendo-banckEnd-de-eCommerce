@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,16 +8,15 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   name      String
   email     String
   password  String
   token     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  addresses UserAddress[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now()) @updatedAt
   orders    Order[]
+  addresses UserAddress[]
 }
 
 model UserAddress {
@@ -38,8 +31,7 @@ model UserAddress {
   complement String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Banner {
@@ -51,20 +43,19 @@ model Banner {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   label       String
   price       Float
   description String?
   categoryId  Int
-  viewsCount  Int      @default(0)
-  salesCount  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
-  images   ProductImage[]
-  metadata ProductMetadata[]
-  category Category          @relation(fields: [categoryId], references: [id])
-  orders   OrderProduct[]
+  viewsCount  Int               @default(0)
+  salesCount  Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now()) @updatedAt
+  orders      OrderProduct[]
+  category    Category          @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  metadata    ProductMetadata[]
 }
 
 model ProductImage {
@@ -73,8 +64,7 @@ model ProductImage {
   url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-
-  product Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model ProductMetadata {
@@ -84,60 +74,55 @@ model ProductMetadata {
   metadataValueId    String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @default(now()) @updatedAt
-
-  product Product @relation(fields: [productId], references: [id])
+  product            Product  @relation(fields: [productId], references: [id])
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  slug      String   @unique
+  id        Int                @id @default(autoincrement())
+  slug      String             @unique
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  products Product[]
-  metadata CategoryMetadata[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
+  metadata  CategoryMetadata[]
+  products  Product[]
 }
 
 model CategoryMetadata {
-  id         String   @id
+  id         String          @id
   name       String
   categoryId Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-
-  category Category        @relation(fields: [categoryId], references: [id])
-  values   MetadataValue[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @default(now()) @updatedAt
+  category   Category        @relation(fields: [categoryId], references: [id])
+  values     MetadataValue[]
 }
 
 model MetadataValue {
-  id                 String   @id
+  id                 String           @id
   label              String
   categoryMetadataId String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @default(now()) @updatedAt
-
-  categoryMetadata CategoryMetadata @relation(fields: [categoryMetadataId], references: [id])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @default(now()) @updatedAt
+  categoryMetadata   CategoryMetadata @relation(fields: [categoryMetadataId], references: [id])
 }
 
 model Order {
-  id                 Int      @id @default(autoincrement())
+  id                 Int            @id @default(autoincrement())
   userId             Int
-  status             String   @default("pending")
+  status             String         @default("pending")
   total              Float
-  shippingCost       Float    @default(0)
-  shippingDays       Int      @default(0)
+  shippingCost       Float          @default(0)
+  shippingDays       Int            @default(0)
   shippingZipCode    String?
   shippingNumber     String?
   shippingCity       String?
   shippingState      String?
   shippingCountry    String?
   shippingComplement String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @default(now()) @updatedAt
-
-  orderItems OrderProduct[]
-  user       User           @relation(fields: [userId], references: [id])
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @default(now()) @updatedAt
+  user               User           @relation(fields: [userId], references: [id])
+  orderItems         OrderProduct[]
 }
 
 model OrderProduct {
@@ -148,7 +133,6 @@ model OrderProduct {
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-
-  order Order @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
