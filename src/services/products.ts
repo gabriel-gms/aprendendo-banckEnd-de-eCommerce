@@ -20,7 +20,28 @@ export const getAllProducts = async (filters: ProductFilters) => {
             break
     }
 
-    let where = {}
+    let where: any = {}
+    if(filters.medata && typeof filters.medata === 'object'){
+        let metaFilters = []
+        for(let categoryMetadataId in filters.medata){
+            const value = filters.medata[categoryMetadataId]
+            if(typeof value !== 'string') continue
+            const valueIds = value.split('|').map(v => v.trim()).filter(Boolean)
+            if(valueIds.length === 0) continue
+
+            metaFilters.push({
+                metadata: {
+                    some: {
+                        categoryMetadataId,
+                        metadataValueId: { in: valueIds }
+                    }
+                }
+            })
+            if(metaFilters.length > 0){
+                where.AND = metaFilters
+            }
+        }
+    }
 
     const products = await prisma.product.findMany({
         select: {
