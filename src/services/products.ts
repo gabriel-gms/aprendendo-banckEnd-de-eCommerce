@@ -99,3 +99,42 @@ export const incrementProductView = async (id: number) => {
         }
     })
 }
+
+export const getAllProductsRelated = async (id: number, limit = 4) => {
+    const product = await prisma.product.findUnique({
+        where: {
+            id
+        },
+        select: {
+            categoryId: true
+        }
+    })
+
+    if(!product) return []
+
+    const products = await prisma.product.findMany({
+        where: {
+            categoryId: product.categoryId,
+            id: {
+                not: id
+            }
+        }, 
+        select: {
+            id: true,
+            label: true,
+            price: true,
+            images: {
+                take: 1,
+                orderBy: { id: 'asc' }
+            }
+        },
+        take: limit,
+        orderBy: { viewsCount: 'desc' }
+    })
+
+    return products.map(product => ({
+        ...product,
+        image: product.images[0] ? `media/products/${product.images}` : null,
+        images: undefined
+    }))
+}

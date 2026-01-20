@@ -5,6 +5,7 @@ import { getAbsoluteImageUrl } from "../../utils/get-absolute-image-url";
 import { safeParse } from "zod";
 import { getOneProductSchema } from "../schemas/get-one-product-schema";
 import { getCategory } from "../services/category";
+import { getRelatedProductQuerySchema } from "../schemas/get-related-products-query-schema";
 
 export const getProducts: RequestHandler = async (req , res) => {
     const parseResult = getProductSchema.safeParse(req.query)
@@ -64,4 +65,25 @@ export const getProduct: RequestHandler = async (req , res) => {
         product: productWithAbsoluteImages,
         category
     })
+}
+
+export const getProductsRelated: RequestHandler = async (req , res) => {
+    const parseResultParams = getOneProductSchema.safeParse(req.params)
+    const parseResultQuery = getRelatedProductQuerySchema.safeParse(req.query)
+    if(!parseResultParams.success || !parseResultQuery.success){
+        res.status(404).json({error: "Parâmetros errados"})
+        return
+    }
+    const {id} = parseResultParams.data
+    const {limit} = parseResultQuery.data
+
+    const products = await productsServices.getAllProductsRelated(parseInt(id), limit ? parseInt(limit) : undefined)
+
+    const productWithAbsoluteUrl = products.map(product => ({
+        ...product,
+        image: product.image ? getAbsoluteImageUrl(product.image) : null,
+        liked: false
+    }))
+
+    res.json({ error: null, productsRelated: productWithAbsoluteUrl })
 }
