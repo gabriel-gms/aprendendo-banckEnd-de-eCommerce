@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as bannerController from "../controllers/banner"
 import * as productsController from "../controllers/products"
 import * as categoryController from "../controllers/category"
+import * as cartController from "../controllers/cart"
 
 export const routes = Router()
 
@@ -14,3 +15,5 @@ routes.get('/products', productsController.getProducts)
 routes.get('/products/:id', productsController.getProduct)
 routes.get('/products/:id/related', productsController.getProductsRelated)
 routes.get('/category/:slug/metadata', categoryController.getCategoryMetadata)
+routes.post('/cart/mount', cartController.postCartMount)
+routes.get('/cart/shipping', cartController.getShipping)
