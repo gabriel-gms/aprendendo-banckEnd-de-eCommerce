@@ -1393,7 +1393,8 @@ export const OrderScalarFieldEnum = {
   shippingCountry: 'shippingCountry',
   shippingComplement: 'shippingComplement',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  shippingStreet: 'shippingStreet'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]

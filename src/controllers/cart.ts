@@ -3,6 +3,10 @@ import { getIdProductForCart } from "../schemas/get-id-products-for-cart";
 import { getOneProduct } from "../services/products";
 import { getAbsoluteImageUrl } from "../../utils/get-absolute-image-url";
 import { getZipcodeUser } from "../schemas/get-zipcode-user";
+import { cartFinish } from "../schemas/cart-finish";
+import { getAddressById } from "../services/user";
+import { createOrder } from "../services/order";
+import { Address } from "../types/Address";
 
 export const postCartMount: RequestHandler = async (req , res) => {
     const parseResultId = getIdProductForCart.safeParse(req.body)
@@ -44,5 +48,34 @@ export const getShipping: RequestHandler = async (req , res) => {
         zipcode: zipcode,
         cost: 0,
         days: 0
+    })
+}
+
+export const finishCart: RequestHandler = async (req , res) => {
+    const userId = (req as any).userId
+
+    const parseResult = cartFinish.safeParse(req.body)
+    if(!parseResult.success){
+        res.json({ error: "Body errado" })
+        return
+    }
+    const { cart, addressId } = parseResult.data
+
+    const address = await getAddressById(userId, addressId)
+
+    const shippingCost = 7
+    const shippingDays = 3
+
+    const orderId = await createOrder({
+        userId,
+        address,
+        shippingCost,
+        shippingDays,
+        cart
+    })
+
+    res.json({
+        error: null,
+        url: ""
     })
 }
