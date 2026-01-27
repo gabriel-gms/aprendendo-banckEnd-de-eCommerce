@@ -5,6 +5,9 @@ import { routes } from './routes/main.js'
 const server = express()
 server.use(cors())
 server.use(express.static('public'))
+
+server.use('/webhook/stripe', express.raw({ type: 'application/json' }))
+
 server.use(express.json())
 
 server.use(routes)
