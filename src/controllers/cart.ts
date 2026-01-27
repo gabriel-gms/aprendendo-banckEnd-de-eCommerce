@@ -7,6 +7,7 @@ import { cartFinish } from "../schemas/cart-finish";
 import { getAddressById } from "../services/user";
 import { createOrder } from "../services/order";
 import { Address } from "../types/Address";
+import { createPaymentLink } from "../services/payment";
 
 export const postCartMount: RequestHandler = async (req , res) => {
     const parseResultId = getIdProductForCart.safeParse(req.body)
@@ -62,6 +63,10 @@ export const finishCart: RequestHandler = async (req , res) => {
     const { cart, addressId } = parseResult.data
 
     const address = await getAddressById(userId, addressId)
+    if(!address){
+        res.json({ error: "Não existe address" })
+        return
+    }
 
     const shippingCost = 7
     const shippingDays = 3
@@ -74,8 +79,18 @@ export const finishCart: RequestHandler = async (req , res) => {
         cart
     })
 
+    if(!orderId){
+        res.json({ error: 'ocorreu um erro' })
+        return
+    }
+
+    let url = await createPaymentLink({ cart, shippingCost, orderId })
+    if(!url){
+        res.json({ error: 'ocorreu um erro' })
+    }
+
     res.json({
         error: null,
-        url: ""
+        url
     })
 }
