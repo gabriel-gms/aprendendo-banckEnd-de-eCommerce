@@ -1,3 +1,4 @@
+import { tr } from "zod/v4/locales"
 import { prisma } from "../libs/prisma"
 import { Address } from "../types/Address"
 import { CartItem } from "../types/CartItem"
@@ -56,4 +57,71 @@ export const updateOrderStatus = async (orderId: number, status: 'paid' | 'cance
         where: { id: orderId },
         data: { status }
     })
+}
+
+export const getUserOrders = async (userId: number) => {
+    return await prisma.order.findMany({
+        where: { userId },
+        select: {
+            id: true,
+            status: true,
+            total: true,
+            createdAt: true
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+}
+
+export const getOrderById = async (id: number, userId: number) => {
+    const order = await prisma.order.findFirst({
+        where: { id, userId },
+        select: {
+            id: true,
+            status: true,
+            total: true,
+            shippingCity: true,
+            shippingComplement: true,
+            shippingCost: true,
+            shippingCountry: true,
+            shippingDays: true,
+            shippingNumber: true,
+            shippingState: true,
+            shippingStreet: true,
+            shippingZipCode: true,
+            createdAt: true,
+            orderItems: {
+                select: {
+                    id: true,
+                    quantity: true,
+                    price: true,
+                    product: {
+                        select: {
+                            id: true,
+                            label: true,
+                            price: true,
+                            images: {
+                                take: 1,
+                                orderBy: {id: 'asc'}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+    if(!order){
+        return null
+    }
+
+    return {
+        ...order,
+        orderItems: order.orderItems.map(item => ({
+            ...item,
+            product: {
+                ...item.product,
+                image: item.product.images[0] ? `media/products/${item.product.images[0].url}` : null,
+                images: undefined
+            }
+        }))
+    }
 }

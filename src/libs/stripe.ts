@@ -60,3 +60,7 @@ export const getConstructEvent = async (rawBody: string, sig: string, webhookKey
         return null
     }
 }
+
+export const getStripeCheckoutSession = async (session_id: string) => {
+    return await stripe.checkout.sessions.retrieve(session_id)
+}

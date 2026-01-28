@@ -6,6 +6,7 @@ import * as cartController from "../controllers/cart"
 import * as userController from "../controllers/user"
 import { authMid } from "../middleware/auth";
 import * as stripeController from '../controllers/webhook'
+import * as orderController from '../controllers/order'
 
 export const routes = Router()
 
@@ -27,3 +28,6 @@ routes.post('/user/address', authMid, userController.postUserAddress)
 routes.get('/user/address', authMid, userController.getUserAddress)
 routes.post('/cart/finish', authMid, cartController.finishCart)
 routes.post('/webhook/stripe', stripeController.stripe)
+routes.get('/orders/session', orderController.getOrderBySessionId)
+routes.get('/orders', authMid, orderController.listOrders)
+routes.get('/orders/:id', authMid, orderController.getOrder)
